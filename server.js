@@ -20,10 +20,10 @@ const app = express();
 app.use(helmet());
 
 // ── CORS — allow frontend origin from env ─────────────
+const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'https://makeasite.online';
 const allowedOrigins = [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
-    'http://localhost:5173', // always allow local dev
-    'http://localhost:5174', // Vite fallback port
+    FRONTEND_ORIGIN,
+    'https://makeasite.online',
 ];
 
 
@@ -90,5 +90,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
-    console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+    console.log(`🌐 Frontend URL: ${FRONTEND_ORIGIN}`);
 });

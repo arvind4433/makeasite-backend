@@ -14,7 +14,7 @@ if (googleSecretOk) {
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback',
+            callbackURL: process.env.GOOGLE_CALLBACK_URL || 'https://makeasite-backend.onrender.com/api/auth/google/callback',
             scope: ['profile', 'email'],
         },
         async (accessToken, refreshToken, profile, done) => {
@@ -63,7 +63,7 @@ if (googleSecretOk) {
         '   1. Go to https://console.cloud.google.com/apis/credentials',
         '   2. Open your OAuth client → copy the real Client Secret',
         `   3. In backend/.env set: GOOGLE_CLIENT_SECRET=<your_real_secret>`,
-        '   4. Add Authorised redirect URI: http://localhost:5000/api/auth/google/callback',
+        '   4. Add Authorised redirect URI: https://makeasite-backend.onrender.com/api/auth/google/callback',
         '   5. Restart the backend server',
     ].join('\n'));
 }
@@ -75,7 +75,7 @@ if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
         {
             clientID: process.env.FACEBOOK_APP_ID,
             clientSecret: process.env.FACEBOOK_APP_SECRET,
-            callbackURL: process.env.FACEBOOK_CALLBACK_URL || 'http://localhost:5000/api/auth/facebook/callback',
+            callbackURL: process.env.FACEBOOK_CALLBACK_URL || 'https://makeasite-backend.onrender.com/api/auth/facebook/callback',
             profileFields: ['id', 'displayName', 'photos', 'email'],
         },
         async (accessToken, refreshToken, profile, done) => {
