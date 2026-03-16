@@ -21,20 +21,24 @@ app.use(helmet());
 
 // ── CORS — allow frontend origin from env ─────────────
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'https://makeasite.online';
-const allowedOrigins = [
-    FRONTEND_ORIGIN,
-    'https://makeasite.online',
-];
 
+const allowedOrigins = new Set([
+    'https://makeasite.online',
+    'https://www.makeasite.online',   // www subdomain — live production
+    'http://localhost:5173',           // Vite dev
+    'http://localhost:3000',           // CRA / Next dev
+    FRONTEND_ORIGIN,                   // Whatever is in FRONTEND_URL env var
+]);
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (curl, Postman, server-to-server)
-        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+        // Allow no-origin requests (Postman, curl, server-to-server)
+        if (!origin || allowedOrigins.has(origin)) return callback(null, true);
         callback(new Error(`CORS: origin ${origin} not allowed`));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 // ── Body parser ────────────────────────────────────────
