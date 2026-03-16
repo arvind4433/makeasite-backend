@@ -39,7 +39,7 @@ const createOrder = async (req, res) => {
                         <p style="margin:4px 0;color:#e2e8f0;font-size:14px"><strong>Estimated Budget:</strong> SAR ${(budget || 0).toLocaleString()}</p>
                     </div>
                     <p style="color:#94a3b8">Your order is now in the cart. Please proceed to payment from your dashboard.</p>
-                    <p style="color:#64748b;font-size:12px;margin-top:24px">Thank you for choosing WebDevPro.</p>
+                    <p style="color:#64748b;font-size:12px;margin-top:24px">Thank you for choosing MakeASite.</p>
                 </div>`,
         }).catch(() => { });
 

@@ -120,6 +120,31 @@ router.get(
 );
 
 
+/* ───────── TEST EMAIL (Admin / Debug) ───────── */
+// GET /api/auth/test-email?to=email@example.com
+// Used to verify email delivery is working on the live server.
+router.get('/test-email', async (req, res) => {
+    const to = req.query.to;
+    if (!to) return res.status(400).json({ message: 'Provide ?to=email@example.com' });
+    try {
+        const sendEmail = require('../utils/sendEmail');
+        await sendEmail({
+            email: to,
+            subject: 'MakeASite — Email Delivery Test ✅',
+            html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:32px;border-radius:12px;background:#0f172a;color:#f1f5f9">
+                <h2 style="color:#ef4444;margin-bottom:8px">Email Delivery Working!</h2>
+                <p style="color:#94a3b8">This is a test email from <strong>MakeASite</strong>.</p>
+                <p style="color:#94a3b8">If you received this, your email configuration is correctly set up.</p>
+                <p style="color:#64748b;font-size:12px;margin-top:24px">Sent at: ${new Date().toLocaleString()}</p>
+            </div>`,
+        });
+        res.json({ message: `Test email sent to ${to}. Check your inbox.` });
+    } catch (err) {
+        res.status(500).json({ message: 'Email send failed: ' + err.message });
+    }
+});
+
+
 /* ───────── PROTECTED ROUTE ───────── */
 
 router.get("/profile", protect, getUserProfile);

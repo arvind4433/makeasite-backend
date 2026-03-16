@@ -33,10 +33,10 @@ const registerUser = async (req, res) => {
         try {
             await sendEmail({
                 email: user.email,
-                subject: 'Verify your WebDevPro account',
+                subject: 'Verify your MakeASite account',
                 html: `
                     <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:32px;border-radius:12px;background:#0f172a;color:#f1f5f9">
-                        <h2 style="color:#ef4444;margin-bottom:8px">Welcome to WebDevPro!</h2>
+                        <h2 style="color:#ef4444;margin-bottom:8px">Welcome to MakeASite!</h2>
                         <p style="color:#94a3b8;margin-bottom:24px">Hi ${user.name}, please verify your email address to get started.</p>
                         <div style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px;text-align:center;margin-bottom:24px">
                             <p style="color:#94a3b8;font-size:13px;margin:0 0 8px">Your one-time verification code</p>
@@ -78,7 +78,7 @@ const authUser = async (req, res) => {
         try {
             await sendEmail({
                 email: user.email,
-                subject: 'Your WebDevPro Login Code',
+                subject: 'Your MakeASite Login Code',
                 html: `
                     <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:32px;border-radius:12px;background:#0f172a;color:#f1f5f9">
                         <h2 style="color:#ef4444;margin-bottom:8px">Sign-in verification</h2>
@@ -206,7 +206,7 @@ const forgotPassword = async (req, res) => {
         try {
             await sendEmail({
                 email: user.email,
-                subject: 'Password Reset Code — WebDevPro',
+                subject: 'Password Reset Code — MakeASite',
                 html: `
                     <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:32px;border-radius:12px;background:#0f172a;color:#f1f5f9">
                         <h2 style="color:#ef4444;margin-bottom:8px">Password Reset</h2>

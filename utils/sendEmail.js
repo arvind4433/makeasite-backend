@@ -37,7 +37,7 @@ const brevoSend = ({ toEmail, subject, html, text }) => {
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) return Promise.resolve(null);
 
-    const fromName = process.env.FROM_NAME || 'WebDevPro';
+    const fromName = process.env.FROM_NAME || 'MakeASite';
     const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER || 'no-reply@makeasite.online';
 
     const payload = JSON.stringify({
@@ -111,7 +111,7 @@ const sendEmail = async ({ email, subject, text, html }) => {
 
     try {
         const transporter = getTransporter();
-        const fromName = process.env.FROM_NAME || 'WebDevPro';
+        const fromName = process.env.FROM_NAME || 'MakeASite';
         const fromEmail = process.env.FROM_EMAIL || user;
 
         // Verify connection first
