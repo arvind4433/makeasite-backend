@@ -33,19 +33,20 @@ app.use(helmet());
 const FRONTEND_ORIGIN =
   process.env.FRONTEND_URL || "https://makeasite.online";
 
-const envOrigins = String(process.env.ALLOWED_ORIGINS || "")
+const configuredOrigins = String(process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-const allowedOrigins = [
-  "https://makeasite.online",
-  "https://www.makeasite.online",
-  "http://localhost:5173",
-  "http://localhost:3000",
-  FRONTEND_ORIGIN,
-  ...envOrigins
-];
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? [...new Set(configuredOrigins.length ? configuredOrigins : [FRONTEND_ORIGIN])]
+    : [...new Set([
+        ...configuredOrigins,
+        FRONTEND_ORIGIN,
+        "http://localhost:5173",
+        "http://localhost:3000"
+      ])];
 
 app.use(
   cors({
