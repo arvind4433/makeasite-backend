@@ -1,98 +1,132 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
-const hpp = require('hpp');
-const rateLimit = require('express-rate-limit');
+import express from "express";
+import cors from "cors";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
+import hpp from "hpp";
 
-// Load environment variables FIRST
+import connectDB from "./config/db.js";
+import passport from "./config/passport.js";
+import { verifyEmailTransport } from "./services/emailService.js";
+
+import logger from "./utils/logger.js";
+
+import errorMiddleware from "./middleware/errorMiddleware.js";
+import requestLogger from "./middleware/requestLogger.js";
+
+import authRoutes from "./routes/authRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
+
 dotenv.config();
-
-// Passport — must load after dotenv so strategies can read env vars
-const passport = require('./config/passport');
 
 const app = express();
 
-// ── Security HTTP headers ──────────────────────────────
+/* SECURITY */
+
 app.use(helmet());
 
-// ── CORS — allow frontend origin from env ─────────────
-const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'https://makeasite.online';
+const FRONTEND_ORIGIN =
+  process.env.FRONTEND_URL || "https://makeasite.online";
 
-const allowedOrigins = new Set([
-    'https://makeasite.online',
-    'https://www.makeasite.online',   // www subdomain — live production
-    'http://localhost:5173',           // Vite dev
-    'http://localhost:3000',           // CRA / Next dev
-    FRONTEND_ORIGIN,                   // Whatever is in FRONTEND_URL env var
-]);
+const envOrigins = String(process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-app.use(cors({
-    origin: (origin, callback) => {
-        // Allow no-origin requests (Postman, curl, server-to-server)
-        if (!origin || allowedOrigins.has(origin)) return callback(null, true);
-        callback(new Error(`CORS: origin ${origin} not allowed`));
+const allowedOrigins = [
+  "https://makeasite.online",
+  "https://www.makeasite.online",
+  "http://localhost:5173",
+  "http://localhost:3000",
+  FRONTEND_ORIGIN,
+  ...envOrigins
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
     },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+    credentials: true
+  })
+);
 
-// ── Body parser ────────────────────────────────────────
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+/* STATIC FILES */
 
-// ── Data sanitization ──────────────────────────────────
-app.use(mongoSanitize()); // NoSQL injection
-app.use(xss());           // XSS
+app.use("/uploads", express.static("public/upload"));
 
-// ── HTTP parameter pollution prevention ───────────────
+/* BODY PARSER */
+
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true }));
+
+/* SECURITY MIDDLEWARE */
+
+app.use(mongoSanitize());
+app.use(xss());
 app.use(hpp());
 
-// ── Passport (stateless — no sessions needed) ─────────
+/* LOGGING */
+
+app.use(requestLogger);
+
+/* PASSPORT */
+
 app.use(passport.initialize());
 
-// ── Rate Limiting ──────────────────────────────────────
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 500,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { message: 'Too many requests from this IP, please try again in 15 minutes.' },
-});
-app.use('/api', limiter);
+/* ROUTES */
 
-// ── Database connection ────────────────────────────────
-const connectDB = require('./config/db');
-connectDB();
+app.use("/api/auth", authRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/reviews", reviewRoutes);
 
-// ── Routes ─────────────────────────────────────────────
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/orders', require('./routes/orderRoutes'));
-app.use('/api/messages', require('./routes/messageRoutes'));
-app.use('/api/payments', require('./routes/paymentRoutes'));
+/* HEALTH CHECK */
 
-// ── Health check ───────────────────────────────────────
-app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'ok',
-        env: process.env.NODE_ENV,
-        db: require('mongoose').connection.readyState === 1 ? 'connected' : 'disconnected',
-    });
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    env: process.env.NODE_ENV,
+    db: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+  });
 });
 
-// ── Global error handler ───────────────────────────────
-app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err.message);
-    res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
-});
+/* ERROR HANDLER */
 
-// ── Start server ───────────────────────────────────────
+app.use(errorMiddleware);
+
+/* SERVER */
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
-    console.log(`🌐 Frontend URL: ${FRONTEND_ORIGIN}`);
-});
+
+const startServer = async () => {
+  try {
+    await connectDB();
+    try {
+      await verifyEmailTransport();
+      logger.info("Email transport verified successfully.");
+    } catch (error) {
+      logger.error(`Email transport verification failed: ${error.message}`);
+    }
+
+    app.listen(PORT, () => {
+      logger.info(`Server running on port ${PORT}`);
+      logger.info(`Frontend URL: ${FRONTEND_ORIGIN}`);
+    });
+  } catch (error) {
+    logger.error(`Startup failed: ${error.message}`);
+    process.exit(1);
+  }
+};
+
+startServer();

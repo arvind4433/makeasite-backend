@@ -1,33 +1,154 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    // password is optional — social-auth users have no password
-    password: { type: String, default: null },
-    country: { type: String, default: '' },
-    phone: { type: String, default: '' },
-    avatar: { type: String, default: '' },   // profile picture URL
-    provider: { type: String, enum: ['local', 'google', 'facebook'], default: 'local' },
-    providerId: { type: String, default: null },  // Google / Facebook UID
-    isVerified: { type: Boolean, default: false },
-    otp: { type: String },
-    otpExpires: { type: Date },
-    role: { type: String, enum: ['user', 'admin'], default: 'user' },
-}, { timestamps: true });
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
 
-/* Only hash password if it was set / changed */
-userSchema.pre('save', async function (next) {
-    if (!this.password || !this.isModified('password')) return next();
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
+  email: {
+    type: String,
+    unique: true,
+    sparse: true,
+    lowercase: true,
+    trim: true
+  },
+
+  phone: {
+    type: String,
+    unique: true,
+    sparse: true,
+    trim: true
+  },
+
+  password: {
+    type: String,
+    select: false
+  },
+
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user"
+  },
+
+  provider: {
+    type: String,
+    enum: ["local", "google", "facebook", "linkedin"],
+    default: "local"
+  },
+
+  googleId: {
+    type: String
+  },
+
+  facebookId: {
+    type: String
+  },
+
+  linkedinId: {
+    type: String
+  },
+
+  avatar: {
+    type: String,
+    default: ""
+  },
+
+  preferences: {
+    notificationsEnabled: {
+      type: Boolean,
+      default: true
+    }
+  },
+
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+
+  phoneVerified: {
+    type: Boolean,
+    default: false
+  },
+
+  otpCode: {
+    type: String
+  },
+
+  otpExpire: {
+    type: Date
+  },
+
+  emailOtpCode: {
+    type: String
+  },
+
+  emailOtpExpire: {
+    type: Date
+  },
+
+  phoneOtpCode: {
+    type: String
+  },
+
+  phoneOtpExpire: {
+    type: Date
+  },
+
+  loginOtpCode: {
+    type: String
+  },
+
+  loginOtpExpire: {
+    type: Date
+  },
+
+  loginOtpTarget: {
+    type: String
+  },
+
+  loginOtpChannel: {
+    type: String,
+    default: null
+  },
+
+  lastLoginIP: {
+    type: String
+  },
+
+  lastLoginAt: {
+    type: Date
+  }
+}, {
+  timestamps: true
 });
 
-userSchema.methods.matchPassword = async function (enteredPassword) {
-    if (!this.password) return false;
-    return bcrypt.compare(enteredPassword, this.password);
+const User = mongoose.model("User", userSchema);
+
+export const cleanupUserIndexes = async () => {
+  try {
+    const indexes = await User.collection.indexes();
+    const staleUsernameIndex = indexes.find((index) => index.name === "username_1");
+
+    if (staleUsernameIndex) {
+      await User.collection.dropIndex("username_1");
+      console.log("Dropped stale username_1 index from users collection.");
+    }
+  } catch (error) {
+    if (
+      !error.message?.includes("ns not found") &&
+      !error.message?.includes("index not found")
+    ) {
+      console.warn(`Could not clean user indexes: ${error.message}`);
+    }
+  }
 };
 
-module.exports = mongoose.model('User', userSchema);
+export default User;

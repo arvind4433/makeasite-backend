@@ -1,9 +1,21 @@
-const express = require('express');
+import express from "express";
+
+import {
+ createPayment,
+ createRazorpayPayment,
+ verifyRazorpayPayment,
+ verifyPayment,
+ getMyPayments
+} from "../controllers/paymentController.js";
+
+import { protect } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
-const { createRazorpayPayment, verifyPayment } = require('../controllers/paymentController');
-const { protect } = require('../middleware/authMiddleware');
 
-router.post('/razorpay', protect, createRazorpayPayment);
-router.post('/verify', protect, verifyPayment);
+router.post("/", protect, createPayment);
+router.get("/my", protect, getMyPayments);
+router.post("/razorpay", protect, createRazorpayPayment);
+router.post("/verify", protect, verifyRazorpayPayment);
+router.post("/verify-manual", protect, verifyPayment);
 
-module.exports = router;
+export default router;

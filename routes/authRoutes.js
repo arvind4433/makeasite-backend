@@ -1,153 +1,194 @@
-const express = require('express');
-const passport = require('passport');
-const jwt = require('jsonwebtoken');
-const rateLimit = require('express-rate-limit');
+import crypto from "crypto";
+import express from "express";
+import passport from "passport";
+
+import {
+  registerUser,
+  loginUser,
+  verifyUserOTP,
+  verifyContactOTP,
+  forgotPassword,
+  resetPassword,
+  getProfile,
+  updateProfile,
+  uploadAvatarController,
+  resendOTP,
+  sendProfileOtp,
+  verifyProfileOtp
+} from "../controllers/authController.js";
+
+import generateToken from "../utils/generateToken.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { validate } from "../middleware/validationMiddleware.js";
+import upload from "../middleware/uploadMiddleware.js";
+import {
+  loginLimiter,
+  otpLimiter,
+  passwordResetLimiter,
+  oauthLimiter
+} from "../middleware/rateLimiter.js";
+import { upsertOAuthUser } from "../config/passport.js";
+
+import {
+  registerSchema,
+  loginSchema,
+  verifyOtpSchema,
+  verifyContactSchema,
+  sendProfileOtpSchema,
+  verifyProfileOtpSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema
+} from "../validation/authValidation.js";
 
 const router = express.Router();
 
-const { protect } = require('../middleware/authMiddleware');
+router.post("/register", otpLimiter, validate(registerSchema), asyncHandler(registerUser));
+router.post("/login", loginLimiter, validate(loginSchema), asyncHandler(loginUser));
+router.post("/verify-otp", otpLimiter, validate(verifyOtpSchema), asyncHandler(verifyUserOTP));
+router.post("/verify-contact-otp", otpLimiter, validate(verifyContactSchema), asyncHandler(verifyContactOTP));
+router.post("/resend-otp", otpLimiter, validate(forgotPasswordSchema), asyncHandler(resendOTP));
+router.post("/forgot-password", passwordResetLimiter, validate(forgotPasswordSchema), asyncHandler(forgotPassword));
+router.post("/reset-password", passwordResetLimiter, validate(resetPasswordSchema), asyncHandler(resetPassword));
+router.get("/profile", protect, asyncHandler(getProfile));
+router.put("/profile", protect, asyncHandler(updateProfile));
+router.post("/profile/send-otp", protect, otpLimiter, validate(sendProfileOtpSchema), asyncHandler(sendProfileOtp));
+router.post("/profile/verify-otp", protect, otpLimiter, validate(verifyProfileOtpSchema), asyncHandler(verifyProfileOtp));
+router.post("/profile/avatar", protect, upload.single("avatar"), asyncHandler(uploadAvatarController));
 
-const {
-    registerUser,
-    authUser,
-    getUserProfile,
-    verifyOTP,
-    forgotPassword,
-    resetPassword
-} = require('../controllers/authController');
+router.get(
+  "/google",
+  oauthLimiter,
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    session: false,
+    prompt: "consent select_account"
+  })
+);
 
-const FRONTEND = process.env.FRONTEND_URL || "https://makeasite.online";
+router.get(
+  "/google/callback",
+  oauthLimiter,
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: `${process.env.FRONTEND_URL}/login`
+  }),
+  (req, res) => {
+    const token = generateToken(req.user._id);
+    res.redirect(`${process.env.FRONTEND_URL}/social-auth?token=${token}&provider=google`);
+  }
+);
 
+router.get(
+  "/linkedin",
+  oauthLimiter,
+  asyncHandler(async (req, res) => {
+    if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET || !process.env.LINKEDIN_CALLBACK_URL) {
+      return res.redirect(`${process.env.FRONTEND_URL}/social-auth?error=linkedin_not_configured&provider=linkedin`);
+    }
 
-/* ───────── RATE LIMITER ───────── */
-
-const authLimiter = rateLimit({
-    windowMs: 10 * 60 * 1000,
-    max: 30,
-    message: { message: "Too many requests, please try again later" }
-});
-
-
-/* ───────── TOKEN HELPER ───────── */
-
-const generateToken = (id) =>
-    jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE || "30d"
+    const state = crypto.randomBytes(16).toString("hex");
+    const params = new URLSearchParams({
+      response_type: "code",
+      client_id: process.env.LINKEDIN_CLIENT_ID,
+      redirect_uri: process.env.LINKEDIN_CALLBACK_URL,
+      scope: "openid profile email",
+      state
     });
 
+    res.redirect(`https://www.linkedin.com/oauth/v2/authorization?${params.toString()}`);
+  })
+);
 
-/* ───────── OAUTH SUCCESS ───────── */
+router.get(
+  "/linkedin/callback",
+  oauthLimiter,
+  asyncHandler(async (req, res) => {
+    const { code, error } = req.query;
 
-const oauthSuccessRedirect = (req, res) => {
+    if (error || !code) {
+      return res.redirect(`${process.env.FRONTEND_URL}/social-auth?error=linkedin_login_failed&provider=linkedin`);
+    }
+
+    if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET || !process.env.LINKEDIN_CALLBACK_URL) {
+      return res.redirect(`${process.env.FRONTEND_URL}/social-auth?error=linkedin_not_configured&provider=linkedin`);
+    }
 
     try {
+      const tokenResponse = await fetch("https://www.linkedin.com/oauth/v2/accessToken", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+          grant_type: "authorization_code",
+          code: String(code),
+          redirect_uri: process.env.LINKEDIN_CALLBACK_URL,
+          client_id: process.env.LINKEDIN_CLIENT_ID,
+          client_secret: process.env.LINKEDIN_CLIENT_SECRET
+        })
+      });
 
-        const user = req.user;
+      if (!tokenResponse.ok) {
+        throw new Error("Unable to exchange LinkedIn token");
+      }
 
-        const token = generateToken(user._id);
+      const tokenData = await tokenResponse.json();
+      const accessToken = tokenData.access_token;
 
-        const data = encodeURIComponent(JSON.stringify({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            avatar: user.avatar || "",
-            provider: user.provider,
-            role: user.role,
-            token
-        }));
+      const profileResponse = await fetch("https://api.linkedin.com/v2/userinfo", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
 
-        res.redirect(`${FRONTEND}/auth/callback?data=${data}`);
-        
-    } catch (error) {
+      if (!profileResponse.ok) {
+        throw new Error("Unable to load LinkedIn profile");
+      }
 
-        res.redirect(`${FRONTEND}/auth/callback?error=oauth_failed`);
+      const profile = await profileResponse.json();
+      const user = await upsertOAuthUser({
+        provider: "linkedin",
+        providerId: profile.sub,
+        name: profile.name || `${profile.given_name || ""} ${profile.family_name || ""}`.trim(),
+        email: profile.email,
+        avatar: profile.picture
+      });
 
+      const token = generateToken(user._id);
+      res.redirect(`${process.env.FRONTEND_URL}/social-auth?token=${token}&provider=linkedin`);
+    } catch {
+      res.redirect(`${process.env.FRONTEND_URL}/social-auth?error=linkedin_login_failed&provider=linkedin`);
     }
-};
-
-
-/* ───────── EMAIL/PASSWORD AUTH ───────── */
-
-router.post("/register", authLimiter, registerUser);
-
-router.post("/login", authLimiter, authUser);
-
-router.post("/verify-otp", authLimiter, verifyOTP);
-
-router.post("/forgot-password", authLimiter, forgotPassword);
-
-router.post("/reset-password", authLimiter, resetPassword);
-
-
-/* ───────── GOOGLE LOGIN ───────── */
-
-router.get(
-    "/google",
-    passport.authenticate("google", {
-        scope: ["profile", "email"],
-        session: false,
-        prompt: "select_account"
-    })
+  })
 );
 
 router.get(
-    "/google/callback",
-    passport.authenticate("google", {
-        session: false,
-        failureRedirect: `${FRONTEND}/auth/callback?error=google_failed`
-    }),
-    oauthSuccessRedirect
-);
-
-
-/* ───────── FACEBOOK LOGIN ───────── */
-
-router.get(
-    "/facebook",
-    passport.authenticate("facebook", {
-        scope: ["email", "public_profile"],
-        session: false
-    })
+  "/facebook",
+  oauthLimiter,
+  passport.authenticate("facebook", {
+    scope: ["email"],
+    session: false
+  })
 );
 
 router.get(
-    "/facebook/callback",
-    passport.authenticate("facebook", {
-        session: false,
-        failureRedirect: `${FRONTEND}/auth/callback?error=facebook_failed`
-    }),
-    oauthSuccessRedirect
+  "/facebook/callback",
+  oauthLimiter,
+  passport.authenticate("facebook", {
+    session: false,
+    failureRedirect: `${process.env.FRONTEND_URL}/login`
+  }),
+  (req, res) => {
+    const token = generateToken(req.user._id);
+    res.redirect(`${process.env.FRONTEND_URL}/social-auth?token=${token}&provider=facebook`);
+  }
 );
 
-
-/* ───────── TEST EMAIL (Admin / Debug) ───────── */
-// GET /api/auth/test-email?to=email@example.com
-// Used to verify email delivery is working on the live server.
-router.get('/test-email', async (req, res) => {
-    const to = req.query.to;
-    if (!to) return res.status(400).json({ message: 'Provide ?to=email@example.com' });
-    try {
-        const sendEmail = require('../utils/sendEmail');
-        await sendEmail({
-            email: to,
-            subject: 'MakeASite — Email Delivery Test ✅',
-            html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:32px;border-radius:12px;background:#0f172a;color:#f1f5f9">
-                <h2 style="color:#ef4444;margin-bottom:8px">Email Delivery Working!</h2>
-                <p style="color:#94a3b8">This is a test email from <strong>MakeASite</strong>.</p>
-                <p style="color:#94a3b8">If you received this, your email configuration is correctly set up.</p>
-                <p style="color:#64748b;font-size:12px;margin-top:24px">Sent at: ${new Date().toLocaleString()}</p>
-            </div>`,
-        });
-        res.json({ message: `Test email sent to ${to}. Check your inbox.` });
-    } catch (err) {
-        res.status(500).json({ message: 'Email send failed: ' + err.message });
-    }
+router.post("/logout", protect, (req, res) => {
+  res.json({
+    message: "Logged out successfully"
+  });
 });
 
-
-/* ───────── PROTECTED ROUTE ───────── */
-
-router.get("/profile", protect, getUserProfile);
-
-
-module.exports = router;
+export default router;

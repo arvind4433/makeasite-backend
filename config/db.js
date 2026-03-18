@@ -1,95 +1,61 @@
-const mongoose = require('mongoose');
-const dns = require('dns');
+import mongoose from 'mongoose';
+import dns from 'dns';
+import dotenv from 'dotenv';
+import { cleanupUserIndexes } from '../models/User.js';
 
-// ── ISP DNS fix ───────────────────────────────────────
-// The local ISP DNS cannot resolve MongoDB Atlas SRV records.
-// Override to use Google Public DNS (8.8.8.8) within this process.
+dotenv.config({});
+
+// Atlas SRV lookups can fail on some local DNS resolvers.
 dns.setDefaultResultOrder('ipv4first');
 dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
 
-let retryCount = 0;
 const MAX_RETRIES = 5;
-const RETRY_DELAY = 5000; // 5 seconds
-
-/**
- * Converts an SRV URI (mongodb+srv://) to a standard mongodb:// URI if needed.
- * This avoids DNS SRV lookup failures on some Windows/ISP DNS configurations.
- * The standard port for Atlas is 27017.
- */
-const normalizeUri = (uri) => {
-    if (!uri) return uri;
-    // If it's already a standard URI, return as-is
-    if (!uri.startsWith('mongodb+srv://')) return uri;
-    // Keep as SRV — the driver will handle it; we just add options
-    return uri;
-};
+const RETRY_DELAY_MS = 5000;
 
 const connectDB = async () => {
-    const rawUri = process.env.MONGODB_URI || process.env.MONGO_URL;
+  if (!process.env.MONGODB_URI) {
+    throw new Error('MONGODB_URI is not defined in environment variables');
+  }
 
-    if (!rawUri) {
-        console.error('❌ MONGODB_URI is not defined in .env');
-        return;
-    }
+  let lastError;
 
-    const uri = normalizeUri(rawUri);
-
-    const options = {
-        serverSelectionTimeoutMS: 15000,  // 15s to find a server
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt += 1) {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI, {
+        serverSelectionTimeoutMS: 15000,
         socketTimeoutMS: 45000,
         connectTimeoutMS: 15000,
-        maxPoolSize: 10,
-        // Don't force family: 4 — let the OS resolve DNS naturally
-    };
+        maxPoolSize: 10
+      });
 
-    try {
-        await mongoose.connect(uri, options);
-        retryCount = 0;
-        const db = mongoose.connection;
-        console.log(`✅ MongoDB Connected | DB: ${db.name} | State: ${db.readyState}`);
-
-        // ── Drop any stale legacy indexes ──────────────────────────────
-        // The old Order model had a unique `orderNumber` index which causes
-        // E11000 duplicate key errors when orderNumber is null/missing.
-        try {
-            const ordersCollection = db.collection('orders');
-            const indexes = await ordersCollection.indexes();
-            const staleIndex = indexes.find(idx => idx.name === 'orderNumber_1');
-            if (staleIndex) {
-                await ordersCollection.dropIndex('orderNumber_1');
-                console.log('🔧 Dropped stale orderNumber_1 index from orders collection.');
-            }
-        } catch (idxErr) {
-            if (!idxErr.message?.includes('ns not found') && !idxErr.message?.includes('index not found')) {
-                console.warn('⚠️  Could not remove orderNumber_1 index:', idxErr.message);
-            }
-        }
+      await cleanupUserIndexes();
+      console.log('MongoDB connected successfully');
+      return;
     } catch (error) {
-        retryCount++;
-        console.error(`❌ MongoDB connection error (attempt ${retryCount}/${MAX_RETRIES}): ${error.message}`);
+      lastError = error;
+      console.error(
+        `MongoDB connection error (attempt ${attempt}/${MAX_RETRIES}): ${error.message}`
+      );
 
-        if (retryCount < MAX_RETRIES) {
-            console.log(`🔄 Retrying in ${RETRY_DELAY / 1000}s...`);
-            setTimeout(connectDB, RETRY_DELAY);
-        } else {
-            console.error('❌ Max retries reached. Auth endpoints will not work until DB is reachable.');
-            console.error('   👉 Make sure your IP is whitelisted in MongoDB Atlas → Network Access');
-        }
+      if (attempt < MAX_RETRIES) {
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      }
     }
+  }
 
+  throw lastError;
 };
 
-// Handle disconnection events
 mongoose.connection.on('disconnected', () => {
-    console.warn('⚠️  MongoDB disconnected.');
+  console.warn('MongoDB disconnected.');
 });
 
 mongoose.connection.on('reconnected', () => {
-    console.log('✅ MongoDB reconnected.');
+  console.log('MongoDB reconnected.');
 });
 
-mongoose.connection.on('error', (err) => {
-    console.error(`❌ MongoDB error: ${err.message}`);
+mongoose.connection.on('error', (error) => {
+  console.error(`MongoDB error: ${error.message}`);
 });
 
-module.exports = connectDB;
+export default connectDB;

@@ -1,9 +1,19 @@
-const express = require('express');
+import express from "express";
+
+import {
+ sendMessage,
+ getMessages,
+ getMessageThreads,
+ markThreadAsRead
+} from "../controllers/messageController.js";
+
+import { protect } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
-const { sendMessage, getMessages } = require('../controllers/messageController');
-const { protect } = require('../middleware/authMiddleware');
 
-router.route('/').post(protect, sendMessage);
-router.route('/:orderId').get(protect, getMessages);
+router.get("/threads", protect, getMessageThreads);
+router.post("/", protect, sendMessage);
+router.patch("/:orderId/read", protect, markThreadAsRead);
+router.get("/:orderId", protect, getMessages);
 
-module.exports = router;
+export default router;
