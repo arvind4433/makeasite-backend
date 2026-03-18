@@ -33,29 +33,21 @@ app.use(helmet());
 const FRONTEND_ORIGIN =
   process.env.FRONTEND_URL || "https://makeasite.online";
 
-const configuredOrigins = String(process.env.ALLOWED_ORIGINS || "")
+const allowedOrigins = String(process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? [...new Set(configuredOrigins.length ? configuredOrigins : [FRONTEND_ORIGIN])]
-    : [...new Set([
-        ...configuredOrigins,
-        FRONTEND_ORIGIN,
-        "http://localhost:5173",
-        "http://localhost:3000"
-      ])];
-
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
+
+      return callback(new Error("CORS not allowed"));
     },
     credentials: true
   })
