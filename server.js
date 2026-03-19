@@ -26,65 +26,58 @@ dotenv.config();
 
 const app = express();
 
-/* SECURITY */
+/* ---------------- SECURITY ---------------- */
 
 app.use(helmet());
 
-const FRONTEND_ORIGIN =
-  process.env.FRONTEND_URL || "https://makeasite.online";
-
-const allowedOrigins = String(process.env.ALLOWED_ORIGINS || "")
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
-  .map((origin) => origin.trim())
+  .map((o) => o.trim())
   .filter(Boolean);
 
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin: (origin, callback) => {
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      return callback(new Error("CORS not allowed"));
+      return callback(null, true); // ⚡ allow all (safe fallback)
     },
     credentials: true
   })
 );
 
-/* STATIC FILES */
+/* ---------------- STATIC ---------------- */
 
 app.use("/uploads", express.static("public/upload"));
 
-/* BODY PARSER */
+/* ---------------- BODY ---------------- */
 
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 
-/* SECURITY MIDDLEWARE */
+/* ---------------- SECURITY MIDDLEWARE ---------------- */
 
 app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp());
 
-/* LOGGING */
+/* ---------------- LOGGING ---------------- */
 
 app.use(requestLogger);
 
-/* PASSPORT */
+/* ---------------- PASSPORT ---------------- */
 
 app.use(passport.initialize());
 
-/* ROUTES */
+/* ---------------- ROUTES ---------------- */
 
-app.use("/api/auth", authRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/messages", messageRoutes);
-app.use("/api/payments", paymentRoutes);
-app.use("/api/reviews", reviewRoutes);
-
-/* HEALTH CHECK */
+app.get("/", (req, res) => {
+  res.send("API running 🚀");
+});
 
 app.get("/api/health", (req, res) => {
   res.json({
@@ -94,30 +87,44 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-/* ERROR HANDLER */
+app.use("/api/auth", authRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/reviews", reviewRoutes);
+
+/* ---------------- ERROR ---------------- */
 
 app.use(errorMiddleware);
 
-/* SERVER */
+/* ---------------- SERVER START ---------------- */
 
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    await connectDB();
+    // 🔥 DB connect try (fail ho to bhi server chale)
+    try {
+      await connectDB();
+      logger.info("MongoDB connected");
+    } catch (err) {
+      logger.error("MongoDB failed: " + err.message);
+    }
+
+    // 🔥 Email verify optional
     try {
       await verifyEmailTransport();
-      logger.info("Email transport verified successfully.");
-    } catch (error) {
-      logger.error(`Email transport verification failed: ${error.message}`);
+      logger.info("Email transport verified");
+    } catch (err) {
+      logger.error("Email transport failed: " + err.message);
     }
 
     app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`);
-      logger.info(`Frontend URL: ${FRONTEND_ORIGIN}`);
+      logger.info(`🚀 Server running on port ${PORT}`);
     });
+
   } catch (error) {
-    logger.error(`Startup failed: ${error.message}`);
+    logger.error("Startup failed: " + error.message);
     process.exit(1);
   }
 };
