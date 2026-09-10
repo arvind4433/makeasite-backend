@@ -35,9 +35,9 @@ const normalizeOrderPayload = (body = {}) => {
 };
 
 export const createOrder = async (req, res) => {
-  if (!req.user?.emailVerified || !req.user?.phoneVerified) {
+  if (!req.user?.emailVerified) {
     return res.status(403).json({
-      message: "Please verify your email and phone before creating an order."
+      message: "Please verify your email before creating an order."
     });
   }
 

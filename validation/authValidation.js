@@ -56,10 +56,7 @@ export const registerSchema = Joi.object({
     "any.required": "Email is required",
     "string.empty": "Email is required"
   }),
-  phone: phoneField.required().messages({
-    "any.required": "Phone number is required",
-    "string.empty": "Phone number is required"
-  }),
+  phone: phoneField.allow("", null).optional(),
   password: passwordField
 });
 

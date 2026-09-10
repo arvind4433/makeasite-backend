@@ -156,7 +156,7 @@ export const registerUser = async (req, res) => {
     return res.status(400).json({ message: "Phone number already registered" });
   }
 
-  if (exactMatch?.emailVerified && exactMatch?.phoneVerified) {
+  if (exactMatch?.emailVerified) {
     return res.status(400).json({ message: "Email already registered" });
   }
 
@@ -170,6 +170,7 @@ export const registerUser = async (req, res) => {
   user.name = name;
   user.email = email;
   user.phone = phone;
+  user.phoneVerified = true; // Phone verification disabled
   user.password = await bcrypt.hash(password, 10);
   finalizeVerificationFlags(user);
 
@@ -179,21 +180,17 @@ export const registerUser = async (req, res) => {
     debugOtps.email = await sendEmailVerificationOtp(user);
   }
 
-  if (!user.phoneVerified && user.phone) {
-    debugOtps.phone = await sendPhoneVerificationOtp(user);
-  }
-
   await user.save();
 
   return res.status(exactMatch ? 200 : 201).json({
-    message: "Verification OTPs sent",
+    message: "Verification OTP sent to your email",
     email: user.email,
     phone: user.phone,
     emailVerified: user.emailVerified,
-    phoneVerified: user.phoneVerified,
+    phoneVerified: true,
     verificationRequired: {
       email: !user.emailVerified,
-      phone: !user.phoneVerified
+      phone: false
     },
     debugOtps: createDebugOtpPayload(debugOtps)
   });
@@ -271,6 +268,7 @@ export const verifyContactOTP = async (req, res) => {
   if (channel === "email") {
     user.emailVerified = true;
     user.isVerified = true;
+    user.phoneVerified = true;
 
     try {
       await sendEmail({
@@ -289,13 +287,13 @@ export const verifyContactOTP = async (req, res) => {
 
   await user.save();
 
-  const registrationComplete = Boolean(user.emailVerified && user.phoneVerified);
+  const registrationComplete = Boolean(user.emailVerified);
   const token = registrationComplete ? generateToken(user._id) : null;
 
   return res.json({
     message: channel === "email" ? "Email verified successfully" : "Phone verified successfully",
     emailVerified: user.emailVerified,
-    phoneVerified: user.phoneVerified,
+    phoneVerified: true,
     completedRegistration: registrationComplete,
     ...(registrationComplete ? { user: toUserPayload(user, token) } : {})
   });
@@ -488,6 +486,10 @@ export const updateProfile = async (req, res) => {
   }
 
   if (typeof req.body.email === "string" && normalizeEmail(req.body.email) !== normalizeEmail(user.email)) {
+    if (user.emailVerified) {
+      return res.status(400).json({ message: "Email cannot be changed once verified. Please contact support." });
+    }
+
     const email = normalizeEmail(req.body.email);
     const existingEmailUser = await User.findOne({
       email,
@@ -515,7 +517,7 @@ export const updateProfile = async (req, res) => {
     }
 
     user.phone = phone;
-    user.phoneVerified = false;
+    user.phoneVerified = true;
   }
 
   await user.save();
