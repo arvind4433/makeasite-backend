@@ -5,7 +5,7 @@ import generateToken from "../utils/generateToken.js";
 import { getUserDeviceInfo } from "../utils/ipTracker.js";
 import { issueOTP, verifyOTP } from "../services/otpService.js";
 import { sendEmail } from "../services/emailService.js";
-import { sendPhoneOtp } from "../services/phoneOtpService.js";
+import { sendPhoneOtp, checkTwilioVerifyCode } from "../services/phoneOtpService.js";
 import cloudinary from "../config/cloudinary.js";
 import {
   otpEmailTemplate,
@@ -14,6 +14,8 @@ import {
   welcomeEmailTemplate,
   loginAlertTemplate
 } from "../services/emailTemplates.js";
+import { OAuth2Client } from "google-auth-library";
+import { upsertOAuthUser } from "../config/passport.js";
 
 const normalizeEmail = (email) => email?.trim().toLowerCase();
 const normalizePhone = (phone) => phone?.trim().replace(/\D/g, "");
@@ -214,7 +216,16 @@ export const verifyUserOTP = async (req, res) => {
     return res.status(400).json({ message: "Please request a fresh login OTP" });
   }
 
-  const valid = verifyOTP(user, otp, "login");
+  let valid = false;
+  if (channel === "phone") {
+    const twilioApproved = await checkTwilioVerifyCode({ phone: user.phone, code: otp });
+    if (twilioApproved === true) {
+      valid = true;
+    }
+  }
+  if (!valid) {
+    valid = verifyOTP(user, otp, "login", channel);
+  }
 
   if (!valid) {
     return res.status(400).json({ message: "Invalid OTP" });
@@ -242,7 +253,16 @@ export const verifyContactOTP = async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
-  const valid = verifyOTP(user, otp, channel);
+  let valid = false;
+  if (channel === "phone") {
+    const twilioApproved = await checkTwilioVerifyCode({ phone: user.phone, code: otp });
+    if (twilioApproved === true) {
+      valid = true;
+    }
+  }
+  if (!valid) {
+    valid = verifyOTP(user, otp, channel, channel);
+  }
 
   if (!valid) {
     return res.status(400).json({ message: "Invalid OTP" });
@@ -314,7 +334,16 @@ export const verifyProfileOtp = async (req, res) => {
   }
 
   const { channel, otp } = req.body;
-  const valid = verifyOTP(user, otp, channel);
+  let valid = false;
+  if (channel === "phone") {
+    const twilioApproved = await checkTwilioVerifyCode({ phone: user.phone, code: otp });
+    if (twilioApproved === true) {
+      valid = true;
+    }
+  }
+  if (!valid) {
+    valid = verifyOTP(user, otp, channel, channel);
+  }
 
   if (!valid) {
     return res.status(400).json({ message: "Invalid OTP" });
@@ -408,7 +437,7 @@ export const resetPassword = async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
-  const valid = verifyOTP(user, otp, "passwordReset");
+  const valid = verifyOTP(user, otp, "passwordReset", "email");
 
   if (!valid) {
     return res.status(400).json({ message: "Invalid OTP" });
@@ -537,4 +566,45 @@ export const uploadAvatarController = async (req, res) => {
     avatar: user.avatar,
     message: "Avatar updated successfully"
   });
+};
+
+export const googleCredentialLogin = async (req, res) => {
+  const { credential } = req.body;
+
+  if (!credential) {
+    return res.status(400).json({ message: "Google credential token is required" });
+  }
+
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) {
+    return res.status(500).json({ message: "Google OAuth is not configured on the server" });
+  }
+
+  try {
+    const client = new OAuth2Client(clientId);
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: clientId
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return res.status(400).json({ message: "Invalid Google credential" });
+    }
+
+    const user = await upsertOAuthUser({
+      provider: "google",
+      providerId: payload.sub,
+      name: payload.name || payload.given_name || "User",
+      email: payload.email,
+      avatar: payload.picture || ""
+    });
+
+    const token = generateToken(user._id);
+    return res.json(toUserPayload(user, token));
+  } catch (error) {
+    return res.status(401).json({
+      message: "Google verification failed: " + (error.message || "Invalid token")
+    });
+  }
 };

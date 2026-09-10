@@ -14,7 +14,8 @@ import {
   uploadAvatarController,
   resendOTP,
   sendProfileOtp,
-  verifyProfileOtp
+  verifyProfileOtp,
+  googleCredentialLogin
 } from "../controllers/authController.js";
 
 import generateToken from "../utils/generateToken.js";
@@ -41,7 +42,11 @@ import {
   resetPasswordSchema
 } from "../validation/authValidation.js";
 
+import { requireDB } from "../middleware/dbMiddleware.js";
+
 const router = express.Router();
+
+router.use(requireDB);
 
 router.post("/register", otpLimiter, validate(registerSchema), asyncHandler(registerUser));
 router.post("/login", loginLimiter, validate(loginSchema), asyncHandler(loginUser));
@@ -59,39 +64,61 @@ router.post("/profile/avatar", protect, upload.single("avatar"), asyncHandler(up
 router.get(
   "/google",
   oauthLimiter,
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    session: false,
-    prompt: "consent select_account"
-  })
+  (req, res, next) => {
+    const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === "production" ? "https://www.makeasite.online" : "http://localhost:5173");
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+      return res.redirect(`${frontendUrl}/social-auth?error=google_not_configured&provider=google`);
+    }
+
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      session: false,
+      prompt: "consent select_account"
+    })(req, res, next);
+  }
 );
 
 router.get(
   "/google/callback",
   oauthLimiter,
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: `${process.env.FRONTEND_URL}/login`
-  }),
-  (req, res) => {
-    const token = generateToken(req.user._id);
-    res.redirect(`${process.env.FRONTEND_URL}/social-auth?token=${token}&provider=google`);
+  (req, res, next) => {
+    const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === "production" ? "https://www.makeasite.online" : "http://localhost:5173");
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+      return res.redirect(`${frontendUrl}/social-auth?error=google_not_configured&provider=google`);
+    }
+
+    passport.authenticate("google", {
+      session: false,
+      failureRedirect: `${frontendUrl}/social-auth?error=google_login_failed&provider=google`
+    }, (err, user) => {
+      if (err || !user) {
+        return res.redirect(`${frontendUrl}/social-auth?error=google_login_failed&provider=google`);
+      }
+      const token = generateToken(user._id);
+      return res.redirect(`${frontendUrl}/social-auth?token=${token}&provider=google`);
+    })(req, res, next);
   }
 );
+
+router.post("/google", oauthLimiter, asyncHandler(googleCredentialLogin));
 
 router.get(
   "/linkedin",
   oauthLimiter,
   asyncHandler(async (req, res) => {
-    if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET || !process.env.LINKEDIN_CALLBACK_URL) {
-      return res.redirect(`${process.env.FRONTEND_URL}/social-auth?error=linkedin_not_configured&provider=linkedin`);
+    const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === "production" ? "https://www.makeasite.online" : "http://localhost:5173");
+    if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET) {
+      return res.redirect(`${frontendUrl}/social-auth?error=linkedin_not_configured&provider=linkedin`);
     }
+
+    const callbackURL = process.env.LINKEDIN_CALLBACK_URL ||
+      `${process.env.BACKEND_URL || (process.env.NODE_ENV === "production" ? "https://www.makeasite.online" : "http://localhost:5000")}/api/auth/linkedin/callback`;
 
     const state = crypto.randomBytes(16).toString("hex");
     const params = new URLSearchParams({
       response_type: "code",
       client_id: process.env.LINKEDIN_CLIENT_ID,
-      redirect_uri: process.env.LINKEDIN_CALLBACK_URL,
+      redirect_uri: callbackURL,
       scope: "openid profile email",
       state
     });
@@ -104,15 +131,19 @@ router.get(
   "/linkedin/callback",
   oauthLimiter,
   asyncHandler(async (req, res) => {
+    const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === "production" ? "https://www.makeasite.online" : "http://localhost:5173");
     const { code, error } = req.query;
 
     if (error || !code) {
-      return res.redirect(`${process.env.FRONTEND_URL}/social-auth?error=linkedin_login_failed&provider=linkedin`);
+      return res.redirect(`${frontendUrl}/social-auth?error=linkedin_login_failed&provider=linkedin`);
     }
 
-    if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET || !process.env.LINKEDIN_CALLBACK_URL) {
-      return res.redirect(`${process.env.FRONTEND_URL}/social-auth?error=linkedin_not_configured&provider=linkedin`);
+    if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET) {
+      return res.redirect(`${frontendUrl}/social-auth?error=linkedin_not_configured&provider=linkedin`);
     }
+
+    const callbackURL = process.env.LINKEDIN_CALLBACK_URL ||
+      `${process.env.BACKEND_URL || (process.env.NODE_ENV === "production" ? "https://www.makeasite.online" : "http://localhost:5000")}/api/auth/linkedin/callback`;
 
     try {
       const tokenResponse = await fetch("https://www.linkedin.com/oauth/v2/accessToken", {
@@ -123,7 +154,7 @@ router.get(
         body: new URLSearchParams({
           grant_type: "authorization_code",
           code: String(code),
-          redirect_uri: process.env.LINKEDIN_CALLBACK_URL,
+          redirect_uri: callbackURL,
           client_id: process.env.LINKEDIN_CLIENT_ID,
           client_secret: process.env.LINKEDIN_CLIENT_SECRET
         })
@@ -156,9 +187,9 @@ router.get(
       });
 
       const token = generateToken(user._id);
-      res.redirect(`${process.env.FRONTEND_URL}/social-auth?token=${token}&provider=linkedin`);
+      res.redirect(`${frontendUrl}/social-auth?token=${token}&provider=linkedin`);
     } catch {
-      res.redirect(`${process.env.FRONTEND_URL}/social-auth?error=linkedin_login_failed&provider=linkedin`);
+      res.redirect(`${frontendUrl}/social-auth?error=linkedin_login_failed&provider=linkedin`);
     }
   })
 );
@@ -166,22 +197,38 @@ router.get(
 router.get(
   "/facebook",
   oauthLimiter,
-  passport.authenticate("facebook", {
-    scope: ["email"],
-    session: false
-  })
+  (req, res, next) => {
+    const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === "production" ? "https://www.makeasite.online" : "http://localhost:5173");
+    if (!process.env.FACEBOOK_APP_ID || !process.env.FACEBOOK_APP_SECRET) {
+      return res.redirect(`${frontendUrl}/social-auth?error=facebook_not_configured&provider=facebook`);
+    }
+
+    passport.authenticate("facebook", {
+      scope: ["email"],
+      session: false
+    })(req, res, next);
+  }
 );
 
 router.get(
   "/facebook/callback",
   oauthLimiter,
-  passport.authenticate("facebook", {
-    session: false,
-    failureRedirect: `${process.env.FRONTEND_URL}/login`
-  }),
-  (req, res) => {
-    const token = generateToken(req.user._id);
-    res.redirect(`${process.env.FRONTEND_URL}/social-auth?token=${token}&provider=facebook`);
+  (req, res, next) => {
+    const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === "production" ? "https://www.makeasite.online" : "http://localhost:5173");
+    if (!process.env.FACEBOOK_APP_ID || !process.env.FACEBOOK_APP_SECRET) {
+      return res.redirect(`${frontendUrl}/social-auth?error=facebook_not_configured&provider=facebook`);
+    }
+
+    passport.authenticate("facebook", {
+      session: false,
+      failureRedirect: `${frontendUrl}/social-auth?error=facebook_login_failed&provider=facebook`
+    }, (err, user) => {
+      if (err || !user) {
+        return res.redirect(`${frontendUrl}/social-auth?error=facebook_login_failed&provider=facebook`);
+      }
+      const token = generateToken(user._id);
+      return res.redirect(`${frontendUrl}/social-auth?token=${token}&provider=facebook`);
+    })(req, res, next);
   }
 );
 

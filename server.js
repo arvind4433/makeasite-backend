@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+dotenv.config();
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import xss from "xss-clean";
@@ -22,9 +23,9 @@ import messageRoutes from "./routes/messageRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 
-dotenv.config();
-
 const app = express();
+
+app.set("trust proxy", 1);
 
 /* ---------------- SECURITY ---------------- */
 
@@ -80,10 +81,13 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/health", (req, res) => {
+  const stateMap = { 0: "disconnected", 1: "connected", 2: "connecting", 3: "disconnecting" };
+  const dbState = stateMap[mongoose.connection.readyState] || "unknown";
   res.json({
     status: "ok",
     env: process.env.NODE_ENV,
-    db: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+    db: dbState,
+    dbConnected: mongoose.connection.readyState === 1
   });
 });
 

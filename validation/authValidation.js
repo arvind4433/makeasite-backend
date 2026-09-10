@@ -29,11 +29,13 @@ const phoneField = Joi.string()
   });
 
 const otpField = Joi.string()
-  .length(6)
+  .min(5)
+  .max(6)
   .pattern(/^[0-9]+$/)
   .required()
   .messages({
-    "string.length": "OTP must be 6 digits",
+    "string.min": "OTP must be at least 5 digits",
+    "string.max": "OTP cannot exceed 6 digits",
     "string.pattern.base": "OTP must contain only numbers",
     "string.empty": "OTP is required"
   });

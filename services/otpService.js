@@ -1,3 +1,5 @@
+import { isTwilioSmsConfigured } from "./phoneOtpService.js";
+
 const OTP_EXPIRY_MS = 10 * 60 * 1000;
 
 const FIELD_MAP = {
@@ -17,6 +19,29 @@ const resolveScope = (scope) => {
   return fields;
 };
 
+export const isBrevoConfigured = () => {
+  return Boolean(
+    process.env.BREVO_API_KEY ||
+    (process.env.BREVO_SMTP_USER && (process.env.BREVO_SMTP_PASS || process.env.BREVO_API_KEY)) ||
+    (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS)
+  );
+};
+
+export const isDevFallbackAllowed = (channel = "email") => {
+  // CRITICAL SECURITY RULE: Fallback is NEVER allowed in production
+  if (process.env.NODE_ENV === "production") {
+    return false;
+  }
+
+  // If real phone credentials are provided, disable fallback for phone
+  if (channel === "phone") {
+    return !isTwilioSmsConfigured();
+  }
+
+  // If real email credentials are provided, disable fallback for email
+  return !isBrevoConfigured();
+};
+
 export const generateOTP = () => String(Math.floor(100000 + Math.random() * 900000));
 
 export const issueOTP = (user, scope = "passwordReset") => {
@@ -29,7 +54,23 @@ export const issueOTP = (user, scope = "passwordReset") => {
   return otp;
 };
 
-export const verifyOTP = (user, otp, scope = "passwordReset") => {
+export const verifyOTP = (user, otp, scope = "passwordReset", channel = null) => {
+  const effectiveChannel = channel || (scope === "phone" ? "phone" : "email");
+  const trimmedOtp = String(otp || "").trim();
+
+  // 1. Development-only fallback check (strictly forbidden in production)
+  if (
+    isDevFallbackAllowed(effectiveChannel) &&
+    (trimmedOtp === "12345" || trimmedOtp === "123456")
+  ) {
+    const fields = resolveScope(scope);
+    user[fields.code] = undefined;
+    user[fields.expire] = undefined;
+    console.log(`[Auth Dev Fallback] Verified OTP 12345 for ${effectiveChannel} (scope: ${scope})`);
+    return true;
+  }
+
+  // 2. Standard verification against stored OTP and expiry
   const fields = resolveScope(scope);
   const storedOtp = user[fields.code];
   const storedExpiry = user[fields.expire];
@@ -44,7 +85,7 @@ export const verifyOTP = (user, otp, scope = "passwordReset") => {
     return false;
   }
 
-  if (String(otp) !== String(storedOtp)) {
+  if (trimmedOtp !== String(storedOtp).trim()) {
     return false;
   }
 
