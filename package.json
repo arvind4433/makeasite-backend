@@ -6,9 +6,15 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build": "node scripts/build-chat.js",
+    "test:chat": "node --test tests/chat.test.js",
+    "knowledge:sync": "node scripts/sync-ai-knowledge.js",
+    "knowledge:check": "node scripts/sync-ai-knowledge.js --check",
+    "eval:chat": "node scripts/eval-chat.js"
   },
   "dependencies": {
+    "@google/genai": "^2.22.0",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.9.0",
     "cors": "^2.8.5",
@@ -36,6 +42,7 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
+    "@babel/parser": "^8.0.5",
     "nodemon": "^3.0.1"
   }
 }

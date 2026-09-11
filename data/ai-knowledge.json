@@ -1,0 +1,677 @@
+{
+  "version": 1,
+  "sources": {
+    "src/components/ServicesSection.jsx": "69df9302cd8c5e2eaa9d062f0cb27993d9ab83a576d6b12d3e2a3230a7da4d23",
+    "src/components/FAQ.jsx": "8d0a89084d1f5a7838012327591287f78bb6275403ae3039e56a042634453814",
+    "src/components/HowItWorks.jsx": "93125a274812d8e5721118576cdf535369038183541ee79b01cf6746b9f40103",
+    "src/components/Portfolio.jsx": "7017a31c99eb47b4175e421b589057f726fc32f4497c50ec107394ae57be9b4d",
+    "src/pages/AboutPage.jsx": "0b55f7cd9866ed01d851b2e9b7c519b4ee92813ee6f9a7ae94969cb818861ae4",
+    "src/components/HeroSection.jsx": "0504f89919a2824218243e273aab446d1450e5098c6f91436f43c435e8a482dc",
+    "src/components/TrustSection.jsx": "4344fb87319b34e69249010dec977ceab0e813a0fad5cccaef7d361dd5f91104",
+    "src/pages/PrivacyPolicy.jsx": "e1337239fdab168a51894ba577295585166c22e6646acd9ba138bdfed9ff926f",
+    "src/pages/TermsPage.jsx": "3eb271c7c4e032fbb2918cfb24ba5b6186772d7134608151ee88bc4218b79579",
+    "src/pages/RefundPolicy.jsx": "272a0a15e810b8bdd356af418846e89756190987143afc8331e261f9b60768ee",
+    "src/config/pricing.js": "e7286ae1d696b83b0d9e100e9506865b12cd848ae47a91c0561c96f6fc1d9d18",
+    "src/data/contact.js": "88f5ab1ef300042b200976d26c49c6dd4d89e0ab501823a63da8d57fb61bfa8e"
+  },
+  "contact": {
+    "email": "arvind889481@gmail.com",
+    "phone": "+91 8894810531",
+    "whatsapp": "https://wa.me/918894810531",
+    "location": "India — Remote Worldwide",
+    "path": "/contact"
+  },
+  "chunks": [
+    {
+      "id": "services-1",
+      "section": "services",
+      "source": "src/components/ServicesSection.jsx",
+      "path": "/services",
+      "text": "{\"title\":\"Website Development\",\"desc\":\"Custom-built, responsive websites tailored to your brand — from informational sites to full-stack web apps.\"}"
+    },
+    {
+      "id": "services-2",
+      "section": "services",
+      "source": "src/components/ServicesSection.jsx",
+      "path": "/services",
+      "text": "{\"title\":\"Admin Dashboard Systems\",\"desc\":\"Powerful backend dashboards to manage users, orders, content, and analytics in real time.\"}"
+    },
+    {
+      "id": "services-3",
+      "section": "services",
+      "source": "src/components/ServicesSection.jsx",
+      "path": "/services",
+      "text": "{\"title\":\"E-Commerce Stores\",\"desc\":\"Full-featured online stores with Stripe & Razorpay, product management, and optimized checkout.\"}"
+    },
+    {
+      "id": "services-4",
+      "section": "services",
+      "source": "src/components/ServicesSection.jsx",
+      "path": "/services",
+      "text": "{\"title\":\"UI/UX Design & Redesign\",\"desc\":\"Transform outdated websites into modern, high-converting interfaces with professional design principles.\"}"
+    },
+    {
+      "id": "services-5",
+      "section": "services",
+      "source": "src/components/ServicesSection.jsx",
+      "path": "/services",
+      "text": "{\"title\":\"Bug Fixing & Support\",\"desc\":\"Rapid debugging, security patching, and ongoing technical support to keep your site running flawlessly.\"}"
+    },
+    {
+      "id": "services-6",
+      "section": "services",
+      "source": "src/components/ServicesSection.jsx",
+      "path": "/services",
+      "text": "{\"title\":\"Performance Optimization\",\"desc\":\"Sub-2-second load times with code splitting, asset optimization, and advanced caching strategies.\"}"
+    },
+    {
+      "id": "faq-7",
+      "section": "faq",
+      "source": "src/components/FAQ.jsx",
+      "path": "/#faq",
+      "text": "{\"q\":\"How long does it take to build a website?\",\"a\":\"Timelines depend on the package and complexity. A Basic Website (1–3 pages) typically takes 3–7 days. Standard Websites take 1–2 weeks. Premium or Enterprise-level projects are discussed individually. You can also choose a 2× or 3× faster delivery option when placing your order.\"}"
+    },
+    {
+      "id": "faq-8",
+      "section": "faq",
+      "source": "src/components/FAQ.jsx",
+      "path": "/#faq",
+      "text": "{\"q\":\"What technologies do you use?\",\"a\":\"We specialise in the MERN stack — MongoDB, Express.js, React.js, and Node.js. We also work with Next.js, TypeScript, PostgreSQL, Firebase, Tailwind CSS, Stripe, Razorpay, and more. The technology chosen depends on your project requirements.\"}"
+    },
+    {
+      "id": "faq-9",
+      "section": "faq",
+      "source": "src/components/FAQ.jsx",
+      "path": "/#faq",
+      "text": "{\"q\":\"Can I request custom features?\",\"a\":\"Absolutely. If your requirements go beyond a standard package, we'll discuss the scope and provide a custom quote. Features like payment gateways, user login systems, admin dashboards, booking systems, and AI integrations can all be added.\"}"
+    },
+    {
+      "id": "faq-10",
+      "section": "faq",
+      "source": "src/components/FAQ.jsx",
+      "path": "/#faq",
+      "text": "{\"q\":\"Do you provide support after delivery?\",\"a\":\"Yes. Every project includes 14 days of free post-delivery support to fix bugs and make minor adjustments. For ongoing maintenance, feature additions, or long-term support, we offer flexible monthly packages.\"}"
+    },
+    {
+      "id": "faq-11",
+      "section": "faq",
+      "source": "src/components/FAQ.jsx",
+      "path": "/#faq",
+      "text": "{\"q\":\"How do I place an order?\",\"a\":\"Simply go to the Pricing section, choose a plan that suits you, and click \\\"Get Started\\\". You'll be taken to a registration and order form where you can fill in your project details, select features, and complete a secure payment via Razorpay or Stripe.\"}"
+    },
+    {
+      "id": "faq-12",
+      "section": "faq",
+      "source": "src/components/FAQ.jsx",
+      "path": "/#faq",
+      "text": "{\"q\":\"Is the source code included?\",\"a\":\"100% yes. Once the full payment is made, you receive complete ownership of all source code, design assets, and deployment files. There are no ongoing licensing fees or lock-ins.\"}"
+    },
+    {
+      "id": "faq-13",
+      "section": "faq",
+      "source": "src/components/FAQ.jsx",
+      "path": "/#faq",
+      "text": "{\"q\":\"Do I need to host the website myself?\",\"a\":\"No — we handle deployment for you on platforms like Vercel, Render, or your preferred cloud provider. We can also help you set up a custom domain and SSL certificate as part of the delivery.\"}"
+    },
+    {
+      "id": "faq-14",
+      "section": "faq",
+      "source": "src/components/FAQ.jsx",
+      "path": "/#faq",
+      "text": "{\"q\":\"Can I see a demo before ordering?\",\"a\":\"Yes. Our Portfolio section showcases examples of the types of websites we build. You can also reach out via the Contact form to request a call or discuss your specific requirements before committing.\"}"
+    },
+    {
+      "id": "process-15",
+      "section": "process",
+      "source": "src/components/HowItWorks.jsx",
+      "path": "/#how-it-works",
+      "text": "{\"id\":1,\"title\":\"Choose Plan\",\"desc\":\"Pick a website package that fits your budget and goals.\"}"
+    },
+    {
+      "id": "process-16",
+      "section": "process",
+      "source": "src/components/HowItWorks.jsx",
+      "path": "/#how-it-works",
+      "text": "{\"id\":2,\"title\":\"Select Features\",\"desc\":\"Customize functionality — forms, dashboards, payments, and more.\"}"
+    },
+    {
+      "id": "process-17",
+      "section": "process",
+      "source": "src/components/HowItWorks.jsx",
+      "path": "/#how-it-works",
+      "text": "{\"id\":3,\"title\":\"Submit Details\",\"desc\":\"Tell us about your brand, content, style preferences, and deadline.\"}"
+    },
+    {
+      "id": "process-18",
+      "section": "process",
+      "source": "src/components/HowItWorks.jsx",
+      "path": "/#how-it-works",
+      "text": "{\"id\":4,\"title\":\"Secure Payment\",\"desc\":\"Pay safely via Razorpay or Stripe.\"}"
+    },
+    {
+      "id": "process-19",
+      "section": "process",
+      "source": "src/components/HowItWorks.jsx",
+      "path": "/#how-it-works",
+      "text": "{\"id\":5,\"title\":\"Development\",\"desc\":\"Our team builds your website — clean code, modern design, on time.\"}"
+    },
+    {
+      "id": "process-20",
+      "section": "process",
+      "source": "src/components/HowItWorks.jsx",
+      "path": "/#how-it-works",
+      "text": "{\"id\":6,\"title\":\"Delivery\",\"desc\":\"Receive a fully deployed website ready for your visitors.\"}"
+    },
+    {
+      "id": "portfolio-21",
+      "section": "portfolio",
+      "source": "src/components/Portfolio.jsx",
+      "path": "/portfolio",
+      "text": "{\"type\":\"Business Website\",\"title\":\"Corporate Business Site\",\"desc\":\"Professional multi-page business website with contact forms, service listings, team section, and SEO-optimised landing pages.\",\"tech\":[\"React.js\",\"Node.js\",\"MongoDB\",\"Express.js\"]}"
+    },
+    {
+      "id": "portfolio-22",
+      "section": "portfolio",
+      "source": "src/components/Portfolio.jsx",
+      "path": "/portfolio",
+      "text": "{\"type\":\"Restaurant Website\",\"title\":\"Restaurant & Food Ordering\",\"desc\":\"Stylish restaurant website with online menu, table booking, and food ordering with Razorpay payment integration.\",\"tech\":[\"React.js\",\"Node.js\",\"MongoDB\",\"Razorpay\"]}"
+    },
+    {
+      "id": "portfolio-23",
+      "section": "portfolio",
+      "source": "src/components/Portfolio.jsx",
+      "path": "/portfolio",
+      "text": "{\"type\":\"Hotel Website\",\"title\":\"Hotel Booking Platform\",\"desc\":\"Full hotel management system with room listings, availability calendar, online booking, and admin dashboard.\",\"tech\":[\"React.js\",\"Express.js\",\"MongoDB\",\"JWT Auth\"]}"
+    },
+    {
+      "id": "portfolio-24",
+      "section": "portfolio",
+      "source": "src/components/Portfolio.jsx",
+      "path": "/portfolio",
+      "text": "{\"type\":\"E-Commerce Store\",\"title\":\"Full-Stack E-Commerce\",\"desc\":\"Feature-rich online store with product catalog, cart, Stripe checkout, order tracking, and seller admin panel.\",\"tech\":[\"Next.js\",\"Node.js\",\"MongoDB\",\"Stripe\"]}"
+    },
+    {
+      "id": "portfolio-25",
+      "section": "portfolio",
+      "source": "src/components/Portfolio.jsx",
+      "path": "/portfolio",
+      "text": "{\"type\":\"Portfolio Website\",\"title\":\"Creative Portfolio\",\"desc\":\"Stunning portfolio website for freelancers and creatives — animations, project showcase, testimonials, and contact.\",\"tech\":[\"React.js\",\"Tailwind CSS\",\"Framer Motion\",\"Node.js\"]}"
+    },
+    {
+      "id": "portfolio-26",
+      "section": "portfolio",
+      "source": "src/components/Portfolio.jsx",
+      "path": "/portfolio",
+      "text": "{\"type\":\"SaaS Platform\",\"title\":\"Startup / SaaS Web App\",\"desc\":\"Scalable SaaS platform with subscription billing, role-based access, analytics dashboard, and REST API backend.\",\"tech\":[\"React.js\",\"Node.js\",\"PostgreSQL\",\"Stripe\"]}"
+    },
+    {
+      "id": "business-27",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "{\"title\":\"Clean Code\",\"desc\":\"We write well-structured, maintainable code — following best practices and modern standards on every project.\"}"
+    },
+    {
+      "id": "business-28",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "{\"title\":\"Results-Driven\",\"desc\":\"Every decision we make is focused on helping your business grow — more traffic, more leads, more conversions.\"}"
+    },
+    {
+      "id": "business-29",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "{\"title\":\"Fast Delivery\",\"desc\":\"We move quickly without cutting corners. Most websites are delivered on time or ahead of schedule.\"}"
+    },
+    {
+      "id": "business-30",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "{\"title\":\"Client-First\",\"desc\":\"Your satisfaction is our priority. We communicate openly, respond fast, and iterate until you're thrilled.\"}"
+    },
+    {
+      "id": "business-31",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "{\"title\":\"Premium Quality\",\"desc\":\"We hold ourselves to a high standard — every project we ship looks and performs like a premium product.\"}"
+    },
+    {
+      "id": "business-32",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "{\"title\":\"Long-Term Support\",\"desc\":\"We don't disappear after delivery. We offer ongoing support, maintenance, and feature additions as you scale.\"}"
+    },
+    {
+      "id": "business-33",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "{\"value\":\"1000+\",\"label\":\"Projects Delivered\"}"
+    },
+    {
+      "id": "business-34",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "{\"value\":\"80+\",\"label\":\"Happy Clients\"}"
+    },
+    {
+      "id": "business-35",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "{\"value\":\"5+\",\"label\":\"Years Experience\"}"
+    },
+    {
+      "id": "business-36",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "{\"value\":\"98%\",\"label\":\"Satisfaction Rate\"}"
+    },
+    {
+      "id": "business-37",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "Started with a mission to make premium web development accessible"
+    },
+    {
+      "id": "business-38",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "MakeASite was founded with a simple belief: every great business deserves a great website — one that looks professional, loads fast, and converts visitors into customers."
+    },
+    {
+      "id": "business-39",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "We noticed that most small and growing businesses either couldn't afford premium web development or were forced to settle for low-quality templates that didn't represent their brand."
+    },
+    {
+      "id": "business-40",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "So we built a service that delivers enterprise-grade quality at prices that work for real businesses — starting from just ₹3,000."
+    },
+    {
+      "id": "business-41",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "What drives everything we do"
+    },
+    {
+      "id": "business-42",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "Ready to work together?"
+    },
+    {
+      "id": "business-43",
+      "section": "business",
+      "source": "src/pages/AboutPage.jsx",
+      "path": "/about",
+      "text": "Let's build something great. View our pricing or send us a message."
+    },
+    {
+      "id": "business-44",
+      "section": "business",
+      "source": "src/components/TrustSection.jsx",
+      "path": "/",
+      "text": "Numbers that speak for themselves"
+    },
+    {
+      "id": "business-45",
+      "section": "business",
+      "source": "src/components/TrustSection.jsx",
+      "path": "/",
+      "text": "Results we've delivered for businesses across industries."
+    },
+    {
+      "id": "business-46",
+      "section": "business",
+      "source": "src/components/TrustSection.jsx",
+      "path": "/",
+      "text": "Technologies we work with"
+    },
+    {
+      "id": "business-47",
+      "section": "business",
+      "source": "src/components/TrustSection.jsx",
+      "path": "/",
+      "text": "We specialise in the MERN stack and modern web technologies to build fast, scalable, and reliable applications."
+    },
+    {
+      "id": "business-48",
+      "section": "business",
+      "source": "src/components/TrustSection.jsx",
+      "path": "/",
+      "text": "🔧 We can also build websites using other technologies based on your project needs."
+    },
+    {
+      "id": "policies-49",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "Privacy Policy"
+    },
+    {
+      "id": "policies-50",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "Last updated: March 18, 2026"
+    },
+    {
+      "id": "policies-51",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "This Privacy Policy explains how MakeASite collects, uses, stores, and protects information when users browse the website, create an account, communicate with us, or place an order for website development or related digital services."
+    },
+    {
+      "id": "policies-52",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "1. Information We Collect: We may collect the following information when you use the platform: Name, email address, and phone number Order details, selected package or plan, requested features, notes, and project requirements Messages exchanged through the platform Uploaded files such as profile images, reference images, or project documents Technical information such as IP address, browser details, login activity, and device data for security and service improvement"
+    },
+    {
+      "id": "policies-53",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "2. How We Use Information: Collected information is used to operate and improve the service, including: Communicating with users about orders, revisions, support, verification, or service updates Planning, developing, and delivering the website or digital product requested by the user Managing authentication, account security, and login verification Processing payments through supported payment providers Maintaining records of selected plans, features, and project scope"
+    },
+    {
+      "id": "policies-54",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "3. Data Sharing and Third Parties: We do not sell user data and we do not share personal information with third parties for advertising resale purposes. Information may be shared only where necessary to complete services properly, such as payment processing, email delivery, hosting, file storage, analytics, or legal compliance."
+    },
+    {
+      "id": "policies-55",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "4. Service Scope and Package Responsibility: The platform provides development services based on the selected package, pricing plan, or approved custom quote chosen by the user. If a user purchases a basic or lower-tier package and later requests higher-tier features, advanced integrations, larger-scale workflows, or additional pages beyond the original agreement, those items are not included automatically and may require additional payment. The website owner will make reasonable and professional efforts to complete all work promised in the agreed package, but is not responsible for demands outside the confirmed scope unless both parties agree to updated pricing and deliverables."
+    },
+    {
+      "id": "policies-56",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "5. Reasonable Effort and Platform Misuse: MakeASite is a service platform for development work, not a guarantee of unlimited revisions, unlimited features, or unrealistic outcomes beyond the purchased service. Reasonable effort will always be made to deliver the agreed work professionally and in good faith. However, misuse of the platform, unclear or fraudulent requests, or expectations beyond the purchased service are not the responsibility of the website owner."
+    },
+    {
+      "id": "policies-57",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "6. Storage and Security: We use reasonable administrative and technical safeguards to protect stored information, including authentication controls, secure password handling, and controlled backend access. No internet-based system can guarantee absolute security, but we take practical steps to reduce risk and protect project data."
+    },
+    {
+      "id": "policies-58",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "7. User Rights and Corrections: Users may request corrections to account information or contact us about privacy concerns related to data used for service delivery. Requests may be limited where retention is necessary for payment records, legal compliance, fraud prevention, or active service obligations."
+    },
+    {
+      "id": "policies-59",
+      "section": "policies",
+      "source": "src/pages/PrivacyPolicy.jsx",
+      "path": "/privacy",
+      "text": "8. Contact: For privacy-related questions, please contact the website owner through the official contact methods provided on the platform."
+    },
+    {
+      "id": "policies-60",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "Terms of Use"
+    },
+    {
+      "id": "policies-61",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "Last updated: March 18, 2026"
+    },
+    {
+      "id": "policies-62",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "These Terms of Use govern access to and use of the MakeASite platform and services. By placing an order, creating an account, or using the platform, the user agrees to these terms."
+    },
+    {
+      "id": "policies-63",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "1. Accurate Information Requirement: Users must provide correct and complete information when creating an account, requesting support, or placing an order. This includes contact details, project information, payment details where applicable, and any required documents or files."
+    },
+    {
+      "id": "policies-64",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "2. Service Delivery Based on Selected Package: All services are delivered according to the selected pricing package, approved custom quote, and agreed project scope. If the user selects a lower package but later requests additional pages, advanced systems, premium features, or enterprise-level functionality, those items are outside the original agreement and may require extra charges before work continues."
+    },
+    {
+      "id": "policies-65",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "3. Additional Features and Extra Charges: Features beyond the selected package or quote are not automatically included. The platform owner may provide an additional estimate, revised delivery timeline, or updated payment request before starting out-of-scope work."
+    },
+    {
+      "id": "policies-66",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "4. Acceptable Use and Fraud Prevention: Users agree not to misuse the platform, submit fraudulent orders, impersonate another person, abuse communication tools, attempt unauthorized access, or use the service for unlawful purposes."
+    },
+    {
+      "id": "policies-67",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "5. Payments and Refund Position: Payments are made for development services, planning, execution time, and related project work. If work has already started, payments may not always be fully refundable and refund decisions may depend on project progress, completed milestones, preparation work, and service time already invested."
+    },
+    {
+      "id": "policies-68",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "6. Scope Limits and Owner Rights: The platform owner reserves the right to refuse, pause, or cancel service requests that violate policy, contain abusive or fraudulent behavior, request prohibited content, or become impractical due to non-cooperation, non-payment, or material changes in project scope."
+    },
+    {
+      "id": "policies-69",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "7. Reasonable Service Commitment: The website owner will make reasonable and professional efforts to deliver the work promised in the selected package or custom agreement. However, the owner is not responsible for unrealistic expectations, third-party failures, or requests beyond the approved project scope unless a revised agreement is accepted."
+    },
+    {
+      "id": "policies-70",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "8. Non-Editable Order Understanding: Order details, selected features, pricing breakdowns, and service scope are recorded to help confirm the agreed work. These records may be used to resolve misunderstandings about what was or was not included in the purchased package."
+    },
+    {
+      "id": "policies-71",
+      "section": "policies",
+      "source": "src/pages/TermsPage.jsx",
+      "path": "/terms",
+      "text": "9. Contact: For questions about these Terms of Use, users should contact the platform owner through the website contact channels."
+    },
+    {
+      "id": "policies-72",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "{\"title\":\"Eligible for Full Refund\",\"items\":[\"We are unable to deliver the project within the agreed timeline (and you have not caused the delay).\",\"The final delivery significantly deviates from what was agreed in writing before work started.\",\"You cancel within 24 hours of payment and no work has begun.\"]}"
+    },
+    {
+      "id": "policies-73",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "{\"title\":\"Eligible for Partial Refund\",\"items\":[\"You cancel after work has partially begun — a refund will be issued for the unworked portion.\",\"Significant project scope changes that make completion impossible without additional cost.\"]}"
+    },
+    {
+      "id": "policies-74",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "{\"title\":\"Not Eligible for Refund\",\"items\":[\"Project has been fully delivered and accepted by the client.\",\"Client changes their mind about needing the website after substantial work is done.\",\"Delays caused by client failing to provide required content or feedback.\",\"Request for refund based on personal preference for a different design style (revisions are available).\",\"Third-party issues (hosting, domain registrars, payment gateways) outside our control.\"]}"
+    },
+    {
+      "id": "policies-75",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "Refund Policy"
+    },
+    {
+      "id": "policies-76",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "Last updated: March 2025"
+    },
+    {
+      "id": "policies-77",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "We take refund requests seriously and aim to resolve all disputes fairly. Please read this policy carefully before placing an order. By paying for our services, you agree to this refund policy."
+    },
+    {
+      "id": "policies-78",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "How to Request a Refund"
+    },
+    {
+      "id": "policies-79",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "Email us at arvind889481@gmail.com with your order ID and reason for the refund request within 30 days of payment."
+    },
+    {
+      "id": "policies-80",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "We'll review your request within 3 business days and respond with our decision."
+    },
+    {
+      "id": "policies-81",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "Approved refunds are processed within 7–10 business days, depending on your payment provider."
+    },
+    {
+      "id": "policies-82",
+      "section": "policies",
+      "source": "src/pages/RefundPolicy.jsx",
+      "path": "/refund",
+      "text": "Refunds are returned to the original payment method."
+    },
+    {
+      "id": "contact-83",
+      "section": "contact",
+      "source": "src/data/contact.js",
+      "path": "/contact",
+      "text": "{\"email\":\"arvind889481@gmail.com\",\"phone\":\"+91 8894810531\",\"whatsapp\":\"https://wa.me/918894810531\",\"location\":\"India — Remote Worldwide\",\"path\":\"/contact\"}"
+    },
+    {
+      "id": "pricing-84",
+      "section": "pricing",
+      "source": "src/config/pricing.js",
+      "path": "/pricing",
+      "text": "{\"title\":\"Static Website\",\"subtitle\":\"7-8 pages, no login system\",\"priceINR\":2800,\"features\":[\"7-8 pages\",\"Responsive design\",\"Contact form\",\"Basic SEO setup\"],\"scope\":{\"presetId\":\"static\",\"packageType\":\"basic\",\"planName\":\"Static Website\",\"siteKind\":\"static\",\"pages\":8,\"authTier\":\"none\",\"paymentIntegration\":false,\"featureIds\":[\"seo\"]}}"
+    },
+    {
+      "id": "pricing-85",
+      "section": "pricing",
+      "source": "src/config/pricing.js",
+      "path": "/pricing",
+      "text": "{\"title\":\"Dynamic Website\",\"subtitle\":\"Database + login system\",\"priceINR\":6000,\"displayedRange\":\"INR 5,000 - 10,000\",\"features\":[\"Database-ready pages\",\"Basic login system\",\"API-driven content\",\"Scalable structure\"],\"scope\":{\"presetId\":\"dynamic\",\"packageType\":\"standard\",\"planName\":\"Dynamic Website\",\"siteKind\":\"dynamic\",\"pages\":10,\"authTier\":\"basic\",\"paymentIntegration\":false,\"featureIds\":[]}}"
+    },
+    {
+      "id": "pricing-86",
+      "section": "pricing",
+      "source": "src/config/pricing.js",
+      "path": "/pricing",
+      "text": "{\"title\":\"Advanced Website\",\"subtitle\":\"Animations, integrations, advanced UI\",\"priceINR\":11200,\"features\":[\"Premium auth flow\",\"Payment integration\",\"Motion effects\",\"Advanced interactions\"],\"scope\":{\"presetId\":\"advanced\",\"packageType\":\"premium\",\"planName\":\"Advanced Website\",\"siteKind\":\"dynamic\",\"pages\":12,\"authTier\":\"premium\",\"paymentIntegration\":true,\"featureIds\":[\"animations\"]}}"
+    },
+    {
+      "id": "pricing-87",
+      "section": "pricing",
+      "source": "src/config/pricing.js",
+      "path": "/pricing",
+      "text": "{\"title\":\"Premium Website\",\"subtitle\":\"High-quality design and advanced features\",\"priceINR\":17000,\"features\":[\"Premium UI system\",\"Branded interactions\",\"Higher polish\",\"Feature-rich build\"],\"scope\":{\"presetId\":\"premium\",\"packageType\":\"premium\",\"planName\":\"Premium Website\",\"siteKind\":\"dynamic\",\"pages\":15,\"authTier\":\"premium\",\"paymentIntegration\":true,\"featureIds\":[\"animations\",\"premiumUi\"]}}"
+    },
+    {
+      "id": "pricing-88",
+      "section": "pricing",
+      "source": "src/config/pricing.js",
+      "path": "/pricing",
+      "text": "{\"title\":\"Enterprise Website\",\"subtitle\":\"Complex system or large projects\",\"priceINR\":41300,\"features\":[\"Large scope\",\"Advanced integrations\",\"Complex workflows\",\"Enterprise planning\"],\"scope\":{\"presetId\":\"enterprise\",\"packageType\":\"custom\",\"planName\":\"Enterprise Website\",\"siteKind\":\"dynamic\",\"pages\":40,\"authTier\":\"premium\",\"paymentIntegration\":true,\"featureIds\":[\"animations\",\"premiumUi\",\"enterpriseIntegrations\"]}}"
+    },
+    {
+      "id": "pricing-89",
+      "section": "pricing",
+      "source": "src/config/pricing.js",
+      "path": "/pricing",
+      "text": "{\"title\":\"Simple Dashboard\",\"priceINR\":20900,\"features\":[\"Core dashboard pages\",\"Secure user login\",\"Analytics widgets\",\"Structured reporting views\"],\"scope\":{\"presetId\":\"dashboardSimple\",\"packageType\":\"custom\",\"planName\":\"Simple Dashboard\",\"siteKind\":\"dynamic\",\"pages\":26,\"authTier\":\"basic\",\"paymentIntegration\":false,\"featureIds\":[\"dashboard\",\"analytics\"]}}"
+    },
+    {
+      "id": "pricing-90",
+      "section": "pricing",
+      "source": "src/config/pricing.js",
+      "path": "/pricing",
+      "text": "{\"title\":\"Medium Dashboard\",\"priceINR\":42100,\"features\":[\"Team workflows\",\"Analytics + alerts\",\"Messaging-ready modules\",\"Scalable dashboard architecture\"],\"scope\":{\"presetId\":\"dashboardMedium\",\"packageType\":\"custom\",\"planName\":\"Medium Dashboard\",\"siteKind\":\"dynamic\",\"pages\":61,\"authTier\":\"premium\",\"paymentIntegration\":false,\"featureIds\":[\"dashboard\",\"analytics\",\"emails\",\"chat\"]}}"
+    },
+    {
+      "id": "pricing-91",
+      "section": "pricing",
+      "source": "src/config/pricing.js",
+      "path": "/pricing",
+      "text": "{\"title\":\"Premium Dashboard\",\"priceINR\":116900,\"features\":[\"Premium UI system\",\"Realtime-ready experience\",\"Enterprise integrations\",\"Large-scale product scope\"],\"scope\":{\"presetId\":\"dashboardPremium\",\"packageType\":\"custom\",\"planName\":\"Premium Dashboard\",\"siteKind\":\"dynamic\",\"pages\":176,\"authTier\":\"premium\",\"paymentIntegration\":true,\"featureIds\":[\"dashboard\",\"analytics\",\"emails\",\"chat\",\"premiumUi\",\"enterpriseIntegrations\"]}}"
+    },
+    {
+      "id": "pricing-92",
+      "section": "pricing",
+      "source": "src/config/pricing.js",
+      "path": "/pricing",
+      "text": "{\"currency\":\"INR\",\"calculatorRules\":{\"staticPageMin\":200,\"staticPageMax\":250,\"staticPageDefault\":250,\"dynamicPageMin\":500,\"dynamicPageDefault\":500,\"auth\":{\"none\":0,\"basic\":1000,\"premium\":2000},\"paymentIntegration\":1200},\"extras\":{\"adminPanel\":{\"id\":\"adminPanel\",\"label\":\"Admin Panel\",\"price\":1800},\"cms\":{\"id\":\"cms\",\"label\":\"CMS / Blog\",\"price\":1500},\"seo\":{\"id\":\"seo\",\"label\":\"SEO Setup\",\"price\":800},\"animations\":{\"id\":\"animations\",\"label\":\"Animations / Effects\",\"price\":2000},\"dashboard\":{\"id\":\"dashboard\",\"label\":\"User Dashboard\",\"price\":6000},\"emails\":{\"id\":\"emails\",\"label\":\"Email Notifications\",\"price\":700},\"chat\":{\"id\":\"chat\",\"label\":\"Live Chat\",\"price\":2000},\"analytics\":{\"id\":\"analytics\",\"label\":\"Analytics Integration\",\"price\":900},\"multilingual\":{\"id\":\"multilingual\",\"label\":\"Multi-language\",\"price\":1500},\"darkMode\":{\"id\":\"darkMode\",\"label\":\"Dark Mode\",\"price\":600},\"premiumUi\":{\"id\":\"premiumUi\",\"label\":\"Premium UI System\",\"price\":4300},\"enterpriseIntegrations\":{\"id\":\"enterpriseIntegrations\",\"label\":\"Enterprise Integrations\",\"price\":11800}},\"delivery\":[{\"value\":\"normal\",\"label\":\"Standard\",\"extra\":0},{\"value\":\"fast\",\"label\":\"2x Faster\",\"extra\":1500},{\"value\":\"urgent\",\"label\":\"3x Urgent\",\"extra\":3000}]}"
+    },
+    {
+      "id": "services-93",
+      "section": "services",
+      "source": "src/config/pricing.js",
+      "path": "/pricing",
+      "text": "{\"websiteTypes\":[\"Business Website\",\"Portfolio\",\"E-commerce\",\"Landing Page\",\"SaaS Platform\",\"Blog / News\",\"Educational\",\"Custom\"],\"designStyles\":[\"Modern & Minimal\",\"Bold & Colorful\",\"Corporate & Professional\",\"Creative & Artistic\",\"Dark / Neon\",\"Elegant & Luxury\"]}"
+    }
+  ]
+}

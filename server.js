@@ -23,6 +23,7 @@ import messageRoutes from "./routes/messageRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 
 const app = express();
 
@@ -57,6 +58,9 @@ app.use(
 app.use("/uploads", express.static("public/upload"));
 
 /* ---------------- BODY ---------------- */
+
+// Chat has its own bounded parser and errors; it does not require MongoDB or auth.
+app.use("/api/chat", chatRoutes);
 
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
