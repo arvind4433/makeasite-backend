@@ -134,43 +134,23 @@ const finalizeVerificationFlags = (user) => {
 export const registerUser = async (req, res) => {
   const name = req.body.name?.trim();
   const email = normalizeEmail(req.body.email);
-  const phone = normalizePhone(req.body.phone);
   const password = req.body.password;
 
-  const matches = await User.find({
-    $or: [
-      ...(email ? [{ email }] : []),
-      ...(phone ? [{ phone }] : [])
-    ]
-  });
+  const exactMatch = await User.findOne({ email, provider: "local" });
+  const existingEmailUser = await User.findOne({ email, _id: { $ne: exactMatch?._id } });
 
-  const exactMatch = matches.find((user) => user.email === email && user.phone === phone && user.provider === "local");
-  const otherEmailUser = matches.find((user) => user.email === email && String(user._id) !== String(exactMatch?._id));
-  const otherPhoneUser = matches.find((user) => user.phone === phone && String(user._id) !== String(exactMatch?._id));
-
-  if (otherEmailUser) {
-    return res.status(400).json({ message: "Email already registered" });
-  }
-
-  if (otherPhoneUser) {
-    return res.status(400).json({ message: "Phone number already registered" });
-  }
-
-  if (exactMatch?.emailVerified) {
+  if (existingEmailUser || exactMatch?.emailVerified) {
     return res.status(400).json({ message: "Email already registered" });
   }
 
   const user = exactMatch || new User({
     name,
     email,
-    phone,
     provider: "local"
   });
 
   user.name = name;
   user.email = email;
-  user.phone = phone;
-  user.phoneVerified = true; // Phone verification disabled
   user.password = await bcrypt.hash(password, 10);
   finalizeVerificationFlags(user);
 
@@ -185,12 +165,9 @@ export const registerUser = async (req, res) => {
   return res.status(exactMatch ? 200 : 201).json({
     message: "Verification OTP sent to your email",
     email: user.email,
-    phone: user.phone,
     emailVerified: user.emailVerified,
-    phoneVerified: true,
     verificationRequired: {
-      email: !user.emailVerified,
-      phone: false
+      email: !user.emailVerified
     },
     debugOtps: createDebugOtpPayload(debugOtps)
   });
@@ -364,11 +341,9 @@ export const verifyProfileOtp = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   const email = normalizeEmail(req.body.email);
-  const phone = normalizePhone(req.body.phone);
   const { password } = req.body;
-  const channel = email ? "email" : "phone";
 
-  const user = await findUserByIdentifier({ email, phone }).select("+password");
+  const user = await User.findOne({ email }).select("+password");
 
   if (!user) {
     return res.status(400).json({ message: "Account not found" });
@@ -384,26 +359,16 @@ export const loginUser = async (req, res) => {
     return res.status(400).json({ message: "Invalid password" });
   }
 
-  if (channel === "email" && !user.emailVerified) {
+  if (!user.emailVerified) {
     return res.status(403).json({ message: "Email not verified. Please complete email verification first." });
   }
 
-  if (channel === "phone" && !user.phoneVerified) {
-    return res.status(403).json({ message: "Phone not verified. Please verify phone from your profile or login using email." });
-  }
-
   const device = getUserDeviceInfo(req);
-  const otp = await sendLoginOtp(user, channel, device);
+  user.lastLoginIP = device.ip;
+  user.lastLoginAt = new Date();
   await user.save();
 
-  return res.json({
-    message: `OTP sent to your ${channel}`,
-    email: user.email,
-    phone: user.phone,
-    channel,
-    identifier: channel === "email" ? user.email : user.phone,
-    debugOtp: createDebugOtpPayload(otp)
-  });
+  return res.json(toUserPayload(user, generateToken(user._id)));
 };
 
 export const forgotPassword = async (req, res) => {

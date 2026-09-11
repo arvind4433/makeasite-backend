@@ -56,19 +56,16 @@ export const registerSchema = Joi.object({
     "any.required": "Email is required",
     "string.empty": "Email is required"
   }),
-  phone: phoneField.allow("", null).optional(),
   password: passwordField
 });
 
 export const loginSchema = Joi.object({
-  email: emailField.optional(),
-  phone: phoneField.optional(),
+  email: emailField.required().messages({
+    "any.required": "Email is required",
+    "string.empty": "Email is required"
+  }),
   password: passwordField
-})
-  .or("email", "phone")
-  .messages({
-    "object.missing": "Email or phone is required"
-  });
+});
 
 export const verifyOtpSchema = Joi.object({
   email: emailField.optional(),
